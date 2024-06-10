@@ -1677,8 +1677,6 @@ def pad(x,padding, mode='constant', value=0):
 
 class ReflectionPad2d(Module):
     def __init__(self, padding):
-        if padding < 0:
-            raise RuntimeError(f"padding must be > 0, but got {padding}")
         self.padding = padding
         if isinstance(self.padding, int):
             self.pl = self.padding
@@ -1693,6 +1691,8 @@ class ReflectionPad2d(Module):
             raise ValueError(f"padding must be non-negative")
 
     def execute(self, x):
+        if x.dim() != 4:
+            raise RuntimeError("Input shape must be `(N, C, H, W)`!")
         n,c,h,w = x.shape
         assert (self.pl < w and self.pr < w), f"padding_left and padding_right should be smaller than input width"
         assert (self.pt < h and self.pb < h), f"padding_top and padding_bottom should be smaller than input height"
